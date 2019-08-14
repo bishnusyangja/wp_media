@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'panel',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'licencingSystem.wsgi.application'
 
+AUTH_USER_MODEL = 'panel.User'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
