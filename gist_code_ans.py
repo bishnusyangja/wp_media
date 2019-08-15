@@ -112,6 +112,10 @@ class UserViewSet(viewsets.ModelViewSet):
         # we can check request.user.is_staff and filter accordingly
         return User.objects.all()
 
+    def get_serializer_context(self):
+        cntx = super().get_serializer_context()
+        cntx.update({'user', self.request.user})
+        return cntx
         
         
 # serializer.py
@@ -127,7 +131,8 @@ class UserSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user   = self.context.get('user', None)
-        # requested account if needed we can pass from context
+        # requested user if needed we can pass from context currently it is not used here
+        # just we can pass extra arguments from context get_serializer_context from view.
 
         for field in self.fields.values():
             field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
