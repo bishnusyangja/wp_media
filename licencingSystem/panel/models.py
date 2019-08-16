@@ -65,8 +65,7 @@ class Customer(models.Model):
 class Website(models.Model):
 	url = models.URLField()
 	customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
-
-
+	
 
 
 
