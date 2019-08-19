@@ -5,14 +5,17 @@ from panel.models import User, Plan, Customer, Website
 
 
 class UserSerializer(serializers.ModelSerializer):
+	confirm_password = serializers.CharField()
 	
 	class Meta:
 		model = User
-		fields = ('email', 'comment', 'password', 'confirm_password', )
+		fields = ('email', 'password', 'confirm_password', )
 	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.user   = self.context.get('user', None)
+		self.fields['confirm_password'].write_only = True
+		self.fields['password'].write_only = True
 		# requested user if needed we can pass from context currently it is not used here
 		# just we can pass extra arguments from context get_serializer_context from view.
 		
@@ -27,8 +30,8 @@ class UserSerializer(serializers.ModelSerializer):
 		password = validated_data.pop('password', '')
 		confirm_password = validated_data.pop('confirm_password', '')
 		if not self.is_passwd_confirmed(password, confirm_password):
-			raise serializers.ValidationError \
-				('password confirmation failed. password and confirm_password did not match')
+			raise serializers.ValidationError('password confirmation failed. password'
+											  'and confirm_password did not match')
 		
 		instance = super().create(validated_data)
 		instance.set_password(password)
@@ -57,7 +60,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class WebsiteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Website
-		fields = ('email', 'comment', 'password', 'confirm_password',)
+		fields = ('url', 'customer',)
 	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

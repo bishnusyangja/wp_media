@@ -84,7 +84,7 @@ class LoginRequiredMiddleware(MyMiddleware):
     def process_request(self, request):
         
         # we can also manage for login_exempt_urls or token_required_urls in our middleware
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             # return Response("You should be authenticated")
             return HttpResponseRedirect(settings.LOGIN_URL)
         
