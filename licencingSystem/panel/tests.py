@@ -1,3 +1,13 @@
-from django.test import TestCase
+import unittest
 
-# Create your tests here.
+
+class PanelTestCase(unittest.TestCase):
+	
+	def setUp(self):
+		pass
+	
+	def tearDown(self):
+		pass
+	
+	def test_first_test_case(self):
+		self.assertEqual(1, 1)

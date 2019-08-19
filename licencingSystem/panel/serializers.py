@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from panel.models import User
+
+from panel.helpers import ForeignKeySerializerField, DateTimeSerializer
+from panel.models import User, Plan, Customer, Website
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,32 +36,18 @@ class UserSerializer(serializers.ModelSerializer):
 		return instance
 
 
-class PlanSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ('email', 'comment', 'password', 'confirm_password',)
-	
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.user = self.context.get('user', None)
-		# requested user if needed we can pass from context currently it is not used here
-		# just we can pass extra arguments from context get_serializer_context from view.
-		
-		for field in self.fields.values():
-			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
-										 'blank': '"{fieldname}" is not allowed blank'.format(fieldname=field.label)})
-
-
 class CustomerSerializer(serializers.ModelSerializer):
+	user = ForeignKeySerializerField(model=User, pk="pk", name="email")
+	subscription_renewed_on = DateTimeSerializer(format='%Y-%m-%d %H:%M', required=False, allow_null=True, read_only=True)
+	subscription_valid_till = DateTimeSerializer(format='%Y-%m-%d %H:%M', required=False, allow_null=True, read_only=True)
+	
 	class Meta:
-		model = User
-		fields = ('email', 'comment', 'password', 'confirm_password',)
+		model = Customer
+		fields = ('user', 'subscription', 'subscription_renewed_on', 'subscription_valid_till',)
 	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.user = self.context.get('user', None)
-		# requested user if needed we can pass from context currently it is not used here
-		# just we can pass extra arguments from context get_serializer_context from view.
 		
 		for field in self.fields.values():
 			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
@@ -68,15 +56,28 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class WebsiteSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = User
+		model = Website
 		fields = ('email', 'comment', 'password', 'confirm_password',)
 	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.user = self.context.get('user', None)
-		# requested user if needed we can pass from context currently it is not used here
-		# just we can pass extra arguments from context get_serializer_context from view.
 		
 		for field in self.fields.values():
 			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
 										 'blank': '"{fieldname}" is not allowed blank'.format(fieldname=field.label)})
+
+
+class PlanSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Plan
+		fields = ('name', 'price', 'website_allowed',)
+	
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.user = self.context.get('user', None)
+		
+		for field in self.fields.values():
+			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
+										 'blank': '"{fieldname}" is not allowed blank'.format(fieldname=field.label)})
+

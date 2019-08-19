@@ -18,6 +18,11 @@ class PlanAPIView(viewsets.ModelViewSet):
 	serializer_class = PlanSerializer
 	queryset = Plan.objects.none()
 	
+	http_method_names = ('get', )
+	
+	def get_queryset(self):
+		return Plan.objects.all()
+	
 
 class CustomerAPIView(viewsets.ModelViewSet):
 	serializer_class = CustomerSerializer
