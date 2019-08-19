@@ -1,5 +1,7 @@
 import unittest
 
+from panel.serializers import UserSerializer
+
 
 class PanelTestCase(unittest.TestCase):
 	
@@ -9,5 +11,7 @@ class PanelTestCase(unittest.TestCase):
 	def tearDown(self):
 		pass
 	
-	def test_first_test_case(self):
-		self.assertEqual(1, 1)
+	def test_UserSerializer(self):
+		serializer = UserSerializer(data={'email': 'jpt@gmail.com'})
+		is_valid = serializer.is_valid()
+		self.assertEqual(is_valid, False)
