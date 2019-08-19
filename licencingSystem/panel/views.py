@@ -3,17 +3,15 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import viewsets
 
+from licencingSystem.permissions import StaffPermission
 from panel.models import User, Plan, Customer, Website
 from panel.serializers import UserSerializer, PlanSerializer, CustomerSerializer, WebsiteSerializer
-
-
-class Something():
-	pass
 
 
 class UserAPIView(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
 	queryset = User.objects.none()
+	permission_classes = (StaffPermission, )
 	
 
 class PlanAPIView(viewsets.ModelViewSet):
