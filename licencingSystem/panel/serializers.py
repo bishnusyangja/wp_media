@@ -1,3 +1,6 @@
+import datetime
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from panel.helpers import ForeignKeySerializerField, DateTimeSerializer
@@ -23,16 +26,19 @@ class UserSerializer(serializers.ModelSerializer):
 			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
 										 'blank': '"{fieldname}" is not allowed blank'.format(fieldname=field.label)})
 	
+	def validate(self, attrs):
+		password = attrs.pop('password', '')
+		confirm_password = attrs.pop('confirm_password', '')
+		if not self.is_passwd_confirmed(password, confirm_password):
+			raise serializers.ValidationError('password confirmation failed. password'
+											  'and confirm_password did not match')
+		return attrs
+	
 	def is_passwd_confirmed(self, password, confirm_password):
 		return password == confirm_password
 	
 	def create(self, validated_data):
 		password = validated_data.pop('password', '')
-		confirm_password = validated_data.pop('confirm_password', '')
-		if not self.is_passwd_confirmed(password, confirm_password):
-			raise serializers.ValidationError('password confirmation failed. password'
-											  'and confirm_password did not match')
-		
 		instance = super().create(validated_data)
 		instance.set_password(password)
 		instance.save()
@@ -41,6 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
 	user = ForeignKeySerializerField(model=User, pk="pk", name="email")
+	subscription = ForeignKeySerializerField(model=Plan, pk="pk", name="name", read_only=True)
 	subscription_renewed_on = DateTimeSerializer(format='%Y-%m-%d %H:%M', required=False, allow_null=True, read_only=True)
 	subscription_valid_till = DateTimeSerializer(format='%Y-%m-%d %H:%M', required=False, allow_null=True, read_only=True)
 	
@@ -55,8 +62,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 		for field in self.fields.values():
 			field.error_messages.update({'required': '"{fieldname}"  is required'.format(fieldname=field.label),
 										 'blank': '"{fieldname}" is not allowed blank'.format(fieldname=field.label)})
-
-
+	
+	
 class WebsiteSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Website

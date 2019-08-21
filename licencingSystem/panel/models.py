@@ -57,7 +57,7 @@ class Plan(models.Model):
 
 class Customer(models.Model):
 	user = models.ForeignKey(User, on_delete=models.PROTECT)
-	subscription = models.ForeignKey(Plan, on_delete=models.PROTECT)
+	subscription = models.ForeignKey(Plan, on_delete=models.PROTECT, null=True)
 	subscription_renewed_on = models.DateTimeField(default=None, null=True)
 	subscription_valid_till = models.DateTimeField(default=None, null=True)
 
